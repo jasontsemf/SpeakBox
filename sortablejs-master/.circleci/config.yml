@@ -1,0 +1,41 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.16-browsers
+    steps:
+      - checkout
+
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --immutable
+
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+      - run:
+          name: Bootstrap with Lerna
+          command: yarn lerna bootstrap
+
+      - run: yarn build:umd
+
+      - run:
+          name: Compatibility Test
+          # Only run e2e-tests if the PR
+          # is published by the Sortable Organization
+          command: |
+            if [ -z "$CIRCLE_PR_NUMBER" ];
+            then
+              yarn test:compat
+            fi
+      - run: yarn test
+
+      - store_test_results:
+          path: /tmp/test-results
