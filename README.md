@@ -1,7 +1,7 @@
 # Speak Box
 
 [Live demo on glitch.com](https://speakbox.glitch.me/)
-![speakbox](doc/screencap.png)
+![speakbox](doc/screencap2.png)
 
 ## Intro
 
